@@ -5,4 +5,5 @@ class Employee < ActiveRecord::Base
   validates_format_of :email_id, with: /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
 
   attr_accessible :age, :department, :designation, :email_id, :location, :name
+  default_scope {where("is_deleted is not true")}
 end

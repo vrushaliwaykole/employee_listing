@@ -2,7 +2,11 @@ class EmployeesController < ApplicationController
   # GET /employees
   # GET /employees.json
   def index
-    @employees = Employee.all
+    if(params[:sort_by].present? && params[:order].present?)
+      @employees = Employee.order("#{params[:sort_by]} #{params[:order]}")
+    else
+      @employees = Employee.all
+    end
 
     respond_to do |format|
       format.html # index.html.erb
@@ -73,8 +77,9 @@ class EmployeesController < ApplicationController
   # DELETE /employees/1.json
   def destroy
     @employee = Employee.find(params[:id])
-    @employee.destroy
-
+    @employee.is_deleted = true
+    @employee.deleted_at = Time.now
+    @employee.save
     respond_to do |format|
       format.html { redirect_to employees_url }
       format.json { head :no_content }

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20150801125433) do
+ActiveRecord::Schema.define(:version => 20150801181443) do
 
   create_table "employees", :force => true do |t|
     t.string   "name"
@@ -22,6 +22,8 @@ ActiveRecord::Schema.define(:version => 20150801125433) do
     t.string   "designation"
     t.datetime "created_at",  :null => false
     t.datetime "updated_at",  :null => false
+    t.boolean  "is_deleted"
+    t.datetime "deleted_at"
   end
 
 end

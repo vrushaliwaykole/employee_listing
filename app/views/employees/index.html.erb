@@ -1,14 +1,53 @@
-<h1>Listing employees</h1>
-
-<table>
+<div style="padding: 20px 0px 20px 0px;text-align:center">
+    <h1>Listing employees</h1>
+</div>
+<table class="table table-hover">
   <tr>
-    <th>Name</th>
-    <th>Age</th>
-    <th>Email</th>
-    <th>Location</th>
-    <th>Department</th>
-    <th>Designation</th>
-    <th></th>
+    <th>
+        <span>Name</span>
+        <span>
+            <a href="javascript:;" class="reload_index sorting" data-attr="name" data-order="asc"><i class="fa fa-sort-asc"></i></a>
+            <a href="javascript:;" class="reload_index sorting" data-attr="name" data-order="desc"><i class="fa fa-sort-desc"></i></a>
+        </span>
+    </th>
+    <th>
+        Age
+        <span>
+            <a href="javascript:;" class="reload_index sorting" data-attr="age" data-order="asc"><i class="fa fa-sort-asc"></i></a>
+            <a href="javascript:;" class="reload_index sorting" data-attr="age" data-order="desc"><i class="fa fa-sort-desc"></i></a>
+        </span>
+    </th>
+    <th>
+        Email
+        <span>
+            <a href="javascript:;" class="reload_index sorting" data-attr="email_id" data-order="asc"><i class="fa fa-sort-asc"></i></a>
+            <a href="javascript:;" class="reload_index sorting" data-attr="email_id" data-order="desc"><i class="fa fa-sort-desc"></i></a>
+        </span>
+    </th>
+    <th>
+        Location
+        <span>
+            <a href="javascript:;" class="reload_index sorting" data-attr="location" data-order="asc"><i class="fa fa-sort-asc"></i></a>
+            <a href="javascript:;" class="reload_index sorting" data-attr="location" data-order="desc"><i class="fa fa-sort-desc"></i></a>
+        </span>
+    </th>
+    <th>
+        Department
+        <span>
+            <a href="javascript:;" class="reload_index sorting" data-attr="department" data-order="asc"><i class="fa fa-sort-asc"></i></a>
+            <a href="javascript:;" class="reload_index sorting" data-attr="department" data-order="desc"><i class="fa fa-sort-desc"></i></a>
+        </span>
+    </th>
+    <th>
+        Designation
+        <span>
+            <a href="javascript:;" class="reload_index sorting" data-attr="designation" data-order="asc"><i class="fa fa-sort-asc"></i></a>
+            <a href="javascript:;" class="reload_index sorting" data-attr="designation" data-order="desc"><i class="fa fa-sort-desc"></i></a>
+        </span>
+    </th>
+    <th>
+        Actions
+    </th>
     <th></th>
     <th></th>
   </tr>
@@ -21,9 +60,11 @@
     <td><%= employee.location %></td>
     <td><%= employee.department %></td>
     <td><%= employee.designation %></td>
-    <td><%= link_to 'Show', employee %></td>
-    <td><%= link_to 'Edit', edit_employee_path(employee) %></td>
-    <td><%= link_to 'Destroy', employee, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+    <td>
+        <%= link_to 'Show', employee %>
+        <%= link_to 'Edit', edit_employee_path(employee) %>
+        <%= link_to 'Destroy', employee, method: :delete, data: { confirm: 'Are you sure?' } %>
+    </td>
   </tr>
 <% end %>
 </table>
@@ -31,3 +72,23 @@
 <br />
 
 <%= link_to 'New Employee', new_employee_path %>
+<%= javascript_tag do %>
+    $(document).ready(function(){
+        $(".reload_index").click(function(e){
+            var field = $(e.currentTarget).data("attr");
+            var order = $(e.currentTarget).data("order");
+            window.location.href = window.location.origin + window.location.pathname + "?sort_by=" + field + "&order=" + order;
+        });
+        if(window.location.search != ""){
+            var search = window.location.search.replace("?","");
+            search = search.split("&");
+            var search_params = {};
+            _.each(search,function(field){
+                search_params[field.split("=")[0]] = field.split("=")[1]
+            });
+            if(typeof(search_params.sort_by) !== "undefined" && search_params.sort_by != ""){
+                $(".reload_index.sorting[data-attr='" + search_params.sort_by + "'][data-order='" + search_params.order + "']").addClass("hidden");
+            }
+        }
+    });
+<% end %>
