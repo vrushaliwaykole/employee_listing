@@ -2,15 +2,21 @@
     <h1>Listing employees</h1>
 </div>
 <div>
-    <div class="col-md-6 col-md-offset-3">
+    <div class="col-md-12">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-2 ">
+                <label class="control-label"> Search records: </label>
+            </div>
+            <div class="col-md-3">
                 <div class="form-group">
                     <input type="text" class="search_term form-control"/>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-2">
                 <a href="javascript:;" class="search_employees btn btn-primary">Search</a>
+            </div>
+            <div class="col-md-1 ">
+                <label> Group: </label>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
@@ -86,9 +92,11 @@
     <td><%= employee.designation %></td>
     <% if(employee.id.present?) %>
         <td>
-            <%= link_to 'Show', employee %>
-            <%= link_to 'Edit', edit_employee_path(employee) %>
-            <%= link_to 'Destroy', employee, method: :delete, data: { confirm: 'Are you sure?' } %>
+            <ul class="list-inline">
+                <li><%= link_to 'Show', employee %></li>
+                <li><%= link_to '<i class="fa fa-edit"></i>'.html_safe, edit_employee_path(employee) %></li>
+                <li><%= link_to '<i class="fa fa-trash"></i>'.html_safe, employee, method: :delete, data: { confirm: 'Are you sure?' } %></li>
+            </ul>
         </td>
     <% end %>
   </tr>
@@ -147,15 +155,17 @@
         $(".search_employees").click(function(){
             var search_term = $(".search_term").val();
             var search_params = get_search();
-            if(search_term != ""){
-                var url = "";
-                url = window.location.origin + window.location.pathname + "?";
+            if(search_term == ""){
+                delete search_params.search_term;
+            }else{
                 search_params["search_term"] = search_term;
-                _.each(search_params,function(val,key){
-                    url += key + "=" + val + "&";
-                });
-                window.location.href = url;
             }
+            var url = "";
+            url = window.location.origin + window.location.pathname + "?";
+            _.each(search_params,function(val,key){
+                url += key + "=" + val + "&";
+            });
+            window.location.href = url;
         });
         if(window.location.search != ""){
             var search_params = get_search();
