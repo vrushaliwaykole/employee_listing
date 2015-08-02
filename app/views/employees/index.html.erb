@@ -1,6 +1,30 @@
 <div style="padding: 20px 0px 20px 0px;text-align:center">
     <h1>Listing employees</h1>
 </div>
+<div>
+    <div class="col-md-6 col-md-offset-3">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="text" class="search_term form-control"/>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <a href="javascript:;" class="search_employees btn btn-primary">Search</a>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <select class="group_by form-control">
+                        <option value="">Select</option>
+                        <%["name", "age", "email_id", "location", "department", "designation"].each do |field|%>
+                            <option value="<%=field%>"><%= field.titleize %></option>
+                        <% end %>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <table class="table table-hover">
   <tr>
     <th>
@@ -60,11 +84,13 @@
     <td><%= employee.location %></td>
     <td><%= employee.department %></td>
     <td><%= employee.designation %></td>
-    <td>
-        <%= link_to 'Show', employee %>
-        <%= link_to 'Edit', edit_employee_path(employee) %>
-        <%= link_to 'Destroy', employee, method: :delete, data: { confirm: 'Are you sure?' } %>
-    </td>
+    <% if(employee.id.present?) %>
+        <td>
+            <%= link_to 'Show', employee %>
+            <%= link_to 'Edit', edit_employee_path(employee) %>
+            <%= link_to 'Destroy', employee, method: :delete, data: { confirm: 'Are you sure?' } %>
+        </td>
+    <% end %>
   </tr>
 <% end %>
 </table>
@@ -74,20 +100,73 @@
 <%= link_to 'New Employee', new_employee_path %>
 <%= javascript_tag do %>
     $(document).ready(function(){
+        var get_search = function(){
+            var search = window.location.search.replace("?","");
+            var search_params = {};
+            if(search != ""){
+                search = search.split("&");
+                _.each(search,function(field){
+                    if(field != ""){
+                        search_params[field.split("=")[0]] = field.split("=")[1]
+                    }
+                });
+            }
+            return search_params;
+        }
+        // Reload index page after sorting
         $(".reload_index").click(function(e){
             var field = $(e.currentTarget).data("attr");
             var order = $(e.currentTarget).data("order");
-            window.location.href = window.location.origin + window.location.pathname + "?sort_by=" + field + "&order=" + order;
+            var search_params = get_search();
+            var url = "";
+            url = window.location.origin + window.location.pathname + "?";
+            search_params["sort_by"] = field;
+            search_params["order"] = order;
+            _.each(search_params,function(val,key){
+                url += key + "=" + val + "&";
+            });
+            window.location.href = url;
+        });
+        // Group by records according to selected option
+        $(".group_by").change(function(e){
+            var group_by = $(e.currentTarget).val();
+            var search_params = get_search();
+            var url = "";
+            url = window.location.origin + window.location.pathname + "?";
+            if(group_by == ""){
+                delete search_params.group_by;
+            }else{
+                search_params["group_by"] = group_by;
+            }
+            _.each(search_params,function(val,key){
+                url += key + "=" + val + "&";
+            });
+            window.location.href = url;
+        });
+        // Search according to search term
+        $(".search_employees").click(function(){
+            var search_term = $(".search_term").val();
+            var search_params = get_search();
+            if(search_term != ""){
+                var url = "";
+                url = window.location.origin + window.location.pathname + "?";
+                search_params["search_term"] = search_term;
+                _.each(search_params,function(val,key){
+                    url += key + "=" + val + "&";
+                });
+                window.location.href = url;
+            }
         });
         if(window.location.search != ""){
-            var search = window.location.search.replace("?","");
-            search = search.split("&");
-            var search_params = {};
-            _.each(search,function(field){
-                search_params[field.split("=")[0]] = field.split("=")[1]
-            });
+            var search_params = get_search();
             if(typeof(search_params.sort_by) !== "undefined" && search_params.sort_by != ""){
                 $(".reload_index.sorting[data-attr='" + search_params.sort_by + "'][data-order='" + search_params.order + "']").addClass("hidden");
+            }
+            if(typeof(search_params.group_by) !== "undefined" && search_params.group_by != ""){
+                $(".group_by option[value='" + search_params.group_by + "']").attr("selected","selected");
+            }
+            if(typeof(search_params.search_term) !== "undefined" && search_params.search_term != ""){
+                $(".search_term").val(search_params.search_term);
             }
         }
     });

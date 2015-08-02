@@ -2,11 +2,7 @@ class EmployeesController < ApplicationController
   # GET /employees
   # GET /employees.json
   def index
-    if(params[:sort_by].present? && params[:order].present?)
-      @employees = Employee.order("#{params[:sort_by]} #{params[:order]}")
-    else
-      @employees = Employee.all
-    end
+    @employees = Employee.retrieve(params)
 
     respond_to do |format|
       format.html # index.html.erb
